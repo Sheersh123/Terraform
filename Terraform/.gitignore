@@ -1,0 +1,14 @@
+# Terraform local dirs (providers, modules, cache)
+**/.terraform/
+
+# Terraform state (never commit)
+terraform.tfstate
+terraform.tfstate.*
+
+# Terraform crash logs (optional but recommended)
+crash.log
+crash.*.log
+
+# Terraform variable files if they contain secrets
+*.tfvars
+*.tfvars.json
