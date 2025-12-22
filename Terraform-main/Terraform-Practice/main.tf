@@ -7,10 +7,10 @@ resource "aws_instance" "demo-server" {
     instance_type = "t2.micro"
 
 }
-data "aws_subnet" "default" {
+data "aws_vpc" "default" {
     filter {
-        name = "vpc-id"
-        values = [data.aws_vpc.default.id]
+       name = "isDefault"
+       values = ["true"]
     }
 }
 
