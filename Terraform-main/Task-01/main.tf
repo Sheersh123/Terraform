@@ -11,11 +11,13 @@ resource "aws_instance" "east-1" {
     provider = aws
     ami = "ami-068c0051b15cdb816"
     instance_type="t2.micro"
+    vpc_security_group_ids = [aws_security_group.demo_group.id]
 }
 resource "aws_instance" "east-2" {
     provider = aws.east-2
     ami = "ami-00e428798e77d38d9"
     instance_type = "t2.micro"
+    vpc_security_group_ids = [aws_security_group.demo_group.id]
 }
 data "aws_vpc" "default" {
     filter {
@@ -44,3 +46,24 @@ resource "aws_security_group" "demo_group" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 }
+resource "aws_security_group" "demo_group_2" {
+    description = "allow-HTTP-connection"
+    vpc_id = data.aws_vpc.default
+    ingress {
+        from_port = "80"
+        to_port = "80"
+        protocol = "TCP"
+        cidr_blocks = ["0.0.0.0/0"]
+
+    }
+    egress{
+        from_port = "0"
+        to_port = "0"
+        protocol = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+
+    }
+
+    }
+
+
