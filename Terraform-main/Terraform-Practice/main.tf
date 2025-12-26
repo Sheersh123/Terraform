@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "demo-server" { 
-    ami = "ami-0ecb62995f68bb549"
+    ami = "ami-00e428798e77d38d9"
     instance_type = "t2.micro"
 
 }
@@ -17,7 +17,7 @@ data "aws_vpc" "default" {
 resource "aws_security_group" "demo_group" {
     name= "demo-group"
     description = "Allow HTTP Traffic"
-    vpc_id= "data.aws_vpc.default.id"
+    vpc_id= data.aws_vpc.default.id
 
     ingress {
         description = "Allow Inbond Traffic"
@@ -27,7 +27,7 @@ resource "aws_security_group" "demo_group" {
         cidr_blocks= ["0.0.0.0/0"]
     }
     egress {
-        from_port= "80"
+        from_port= "0"
         to_port= "0"
         protocol = "-1"
         cidr_blocks = ["0.0.0.0/0"]
