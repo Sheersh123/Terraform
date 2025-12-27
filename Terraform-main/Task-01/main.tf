@@ -13,13 +13,28 @@ resource "aws_instance" "east-1" {
     instance_type="t2.micro"
     subnet_id = "subnet-0e23eaa2f89541755"
     vpc_security_group_ids = [aws_security_group.demo_group.id]
-}
+    associate_public_ip_address = true
+    user_data = <<-EOF
+    #!/bin/bash
+    yum update -y
+    yum install nginx 
+    systemctl enable nginx || systemctl start nginx
+    echo "hello from east-1" >> /usr/share/nginx/html/index.html
+    EOF
+ }
+
 resource "aws_instance" "east-2" {
     provider = aws.east-2
     ami = "ami-00e428798e77d38d9"
     instance_type = "t2.micro"
     subnet_id = "subnet-0708482e511e7e669"
     vpc_security_group_ids = [aws_security_group.demo_group_2.id]
+    user_data = <<-EOF
+     yum update -y
+    yum install nginx 
+    systemctl enable nginx || systemctl start nginx
+    echo "hello from east-2">> /usr/share/nginx/html/index.html
+    EOF
 }
 data "aws_vpc" "default" {
     filter {
