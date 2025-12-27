@@ -1,54 +1,53 @@
-# Terraform Infrastructure — Sheersh123/Terraform
+# Terraform Infrastructure -- Sheersh123
 
-A collection of Terraform configurations, modules, and examples for provisioning cloud infrastructure in a repeatable, modular, and testable way.
+A collection of Terraform configurations, reusable modules, and examples to provision cloud infrastructure in a repeatable, modular, and CI-friendly way.
 
 ---
 
 Table of contents
-- [About](#about)
+- [Overview](#overview)
 - [Repository layout](#repository-layout)
-- [Prerequisites](#prerequisites)
-- [Getting started (quickstart)](#getting-started-quickstart)
-- [Usage patterns](#usage-patterns)
+- [Quick start](#quick-start)
+- [How to use this repo](#how-to-use-this-repo)
   - [Using modules](#using-modules)
   - [Working with environments](#working-with-environments)
-- [Recommended workflows & tooling](#recommended-workflows--tooling)
+- [Remote state example](#remote-state-example)
+- [Recommended tools & CI patterns](#recommended-tools--ci-patterns)
 - [Testing & validation](#testing--validation)
+- [Secrets & sensitive data](#secrets--sensitive-data)
 - [Contributing](#contributing)
-- [License](#license)
+- [License & ownership](#license--ownership)
 - [Contact](#contact)
 
-## About
-This repository holds Terraform code and modules to create and manage infrastructure. It is intended to be modular, environment-aware, and CI-friendly so teams can reuse components and follow best practices when provisioning cloud resources.
+## Overview
+This repository is intended as a starting point and a home for reusable Terraform modules and environment stacks. It is designed to be:
+- Modular — small, single-responsibility modules
+- Environment-aware — separate folders for dev/staging/prod
+- CI-friendly — easy to run `fmt`, `validate`, `plan` and tests in automation
 
-Use this repo as:
-- A personal/in-team infrastructure repo
-- A collection of reusable Terraform modules
-- A starting point for CI/CD-driven infrastructure deployments
+Use it as:
+- Your personal/team infrastructure repo
+- A library of reusable modules
+- A reference for CI-driven Terraform workflows
 
 ## Repository layout
-A suggested layout — adapt as needed:
+A suggested layout (adapt to your needs):
 - modules/                — reusable Terraform modules (one module per directory)
-- envs/                   — environment-specific stacks (e.g., envs/dev, envs/prod)
-- examples/               — usage examples for modules and stacks
-- scripts/                — helper scripts (wrappers for Terraform, CI helpers)
+- envs/                   — environment-specific stacks (envs/dev, envs/prod)
+- examples/               — usage examples for modules/stacks
+- scripts/                — helper scripts (wrappers, automation helpers)
 - .github/workflows/      — CI workflows (optional)
 - README.md               — this file
 
 Example:
-- modules/network
-- modules/compute
+- modules/network/
+- modules/compute/
 - envs/staging/main.tf
 - envs/production/main.tf
 - examples/simple-app/main.tf
 
-## Prerequisites
-- Terraform CLI >= 1.0 (recommended latest stable)
-- A supported cloud provider CLI configured (e.g., `aws`, `az`, `gcloud`) and credentials
-- Optional: tflint, terraform-docs, terragrunt (if used), and Docker (for tests)
-
-## Getting started (quickstart)
-1. Clone the repo:
+## Quick start
+1. Clone:
    git clone https://github.com/Sheersh123/Terraform.git
    cd Terraform
 
@@ -58,18 +57,26 @@ Example:
 3. Initialize Terraform:
    terraform init
 
-4. See the planned changes:
+4. Preview changes:
    terraform plan -var-file="dev.tfvars"
 
-5. Apply the changes:
+5. Apply (when ready):
    terraform apply -var-file="dev.tfvars"
 
-Remember to use workspaces, remote state backends, and proper secrets management for team usage.
+Notes:
+- Prefer running `terraform plan` in CI and require human review for `apply` in production.
+- Keep provider credentials and secrets out of the repo.
 
-## Usage patterns
+## How to use this repo
 
 ### Using modules
-A typical module call (example):
+Modules live under `modules/<name>/`. Each module should include:
+- variables.tf — documented inputs
+- outputs.tf — documented outputs
+- README.md — short example + input/output documentation
+- examples/ — one or more usage examples
+
+Example module call:
 ```hcl
 module "vpc" {
   source = "../../modules/network"
@@ -84,18 +91,26 @@ module "vpc" {
 }
 ```
 
-Modules should:
-- Have clear inputs (variables) and outputs
-- Be small and single-responsibility
-- Include an example and README in the module folder
+Best practices:
+- Keep modules small and focused (single responsibility)
+- Use explicit variable names and sensible defaults
+- Provide example usage and tests where practical
+- Pin provider versions in module `required_providers` if needed
 
 ### Working with environments
-Use `envs/<name>/` directories to maintain environment-specific configuration and tfvars:
-- envs/dev/main.tf
-- envs/dev/variables.tf
-- envs/dev/dev.tfvars
+Use `envs/<name>/` for environment-specific configuration:
+- envs/dev/
+  - main.tf
+  - variables.tf
+  - dev.tfvars
 
-Prefer remote state (e.g., S3 + DynamoDB for AWS) and lock state to avoid concurrent changes:
+Recommended patterns:
+- Keep environment-specific values in `*.tfvars`
+- Use remote state backends per environment
+- Use workspaces if you prefer a workspace-based workflow, but directory-per-environment is usually clearer for teams
+
+## Remote state example
+Example S3 backend (AWS):
 ```hcl
 terraform {
   backend "s3" {
@@ -106,56 +121,63 @@ terraform {
   }
 }
 ```
+Replace with your cloud provider's remote state configuration (GCS, Azure Blob, etc.) and ensure state locking is enabled when supported.
 
-## Recommended workflows & tooling
-- Format and validate before commit:
-  terraform fmt -recursive
-  terraform validate
+## Recommended tools & CI patterns
+Local tooling:
+- Terraform CLI (>= 1.0; use latest stable)
+- terraform fmt -recursive
+- terraform validate
+- tflint — linting
+- tfsec / checkov — security scanning
+- terraform-docs — generate module docs
 
-- Static analysis:
-  - tflint
-  - checkov or tfsec (security scanning)
-
-- Generate module docs:
-  terraform-docs md modules/<module>/
-
-- CI:
-  - Run `terraform fmt` and `terraform validate` on pull requests
-  - Use `plan` outputs in PRs; require manual approval for `apply` in protected branches or via automation
+CI suggestions:
+- On PRs run:
+  - terraform fmt (check-only)
+  - terraform validate
+  - tflint / tfsec
+  - `terraform plan` with a safe, read-only credentials set (or plan against a mocked/staging account)
+- Expose `plan` output in PR for reviewers
+- Require manual approval to `apply` for protected branches/environments (or use an operator pipeline)
 
 ## Testing & validation
-- Unit-ish testing: use `terraform plan` with known inputs and diff assertions
-- Integration testing: use tools like Terratest (Go) or kitchen-terraform (Ruby)
-- Linting and security scanning: tflint, tfsec, checkov
+- Unit-ish checks: run `terraform plan` with controlled inputs and validate expected diffs
+- Integration tests: Terratest (Go) or kitchen-terraform (Ruby) for end-to-end testing
+- Linting and security: tflint, tfsec, checkov in CI
 - Example workflow:
-  - Run `terraform init` → `terraform plan` in CI for each PR
-  - Optionally run acceptance tests in a temporary environment and destroy afterwards
+  - PR: `fmt`, `validate`, `tflint`, `tfsec`, `terraform plan`
+  - Optional: run acceptance tests in ephemeral resources and destroy after tests
 
 ## Secrets & sensitive data
-- Never commit secrets or provider credentials to the repo
-- Use remote secret stores (e.g., AWS Secrets Manager, HashiCorp Vault) or CI secrets
-- Use `sensitive = true` for variables that hold secret values
+- Never commit secrets or provider keys to the repo
+- Use CI secret stores or cloud secret managers (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
+- Mark sensitive variables with `sensitive = true` in variable definitions
+- Use environment variables or encrypted secret injection in CI for providers
 
 ## Contributing
-Contributions are welcome. Suggested process:
+Contributions welcome — suggested flow:
 1. Open an issue describing the change or problem.
-2. Create a feature branch: `git checkout -b feat/<short-description>`
-3. Add tests/examples and run `terraform fmt` and `terraform validate`
-4. Open a pull request describing the changes
+2. Create a branch: git checkout -b feat/<short-description>
+3. Implement changes, add/update examples and tests
+4. Run `terraform fmt`, `terraform validate`, and other linters
+5. Open a pull request with a clear description
 
-When contributing modules:
-- Add module-level README and examples
-- Follow input/output naming conventions
-- Keep modules focused and versioned
+Module-specific contribution tips:
+- Provide/maintain module-level README and examples
+- Follow existing naming conventions for inputs/outputs
+- Keep changes small and focused; add tests when possible
 
-## License
-By default this repository does not specify a license. To make this code reusable by others, add a LICENSE file (e.g., MIT, Apache-2.0). Replace this section with the chosen license text or a reference to LICENSE.
+## License & ownership
+This repository currently does not include a license file. To allow reuse, consider adding a LICENSE (MIT, Apache-2.0, etc.). If you are the repo owner, add a LICENSE file at the repository root.
 
 ## Contact
 Repo owner: Sheersh123  
-For questions or support, open an issue or contact the owner via GitHub.
+For questions or support, open an issue in this repository.
 
 ---
-Notes:
-- This README is a template. Customize it to reflect the providers, modules, and CI process you actually use.
-- To make your repo production-ready, add remote state configuration, CI workflows, module documentation, and example `tfvars` files.
+
+Notes & next steps you might want to take:
+- Add a LICENSE file
+- Add module-level READMEs and example tfvars for each environment
+- Add CI workflows under `.github/workflows/` to run fmt/validate/linters and produce plan artifacts
