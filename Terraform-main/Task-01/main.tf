@@ -11,13 +11,14 @@ resource "aws_instance" "east-1" {
     provider = aws
     ami = "ami-068c0051b15cdb816"
     instance_type="t2.micro"
-    subnet_id = "subnet-0a60ca99c5fd94773"
+    subnet_id = "subnet-0e23eaa2f89541755"
     vpc_security_group_ids = [aws_security_group.demo_group.id]
 }
 resource "aws_instance" "east-2" {
     provider = aws.east-2
     ami = "ami-00e428798e77d38d9"
     instance_type = "t2.micro"
+    subnet_id = "subnet-0708482e511e7e669"
     vpc_security_group_ids = [aws_security_group.demo_group_2.id]
 }
 data "aws_vpc" "default" {
@@ -48,10 +49,18 @@ resource "aws_security_group" "demo_group" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 }
+data "aws_vpc" "default_east2" {
+    provider = aws.east-2
+    filter {
+        name = "isDefault"
+        values = ["true"]
+    }
+}
+
 resource "aws_security_group" "demo_group_2" {
     provider =aws.east-2
     description = "allow-HTTP-connection"
-    vpc_id = data.aws_vpc.default.id
+    vpc_id = data.aws_vpc.default_east2.id
     ingress {
         from_port = "80"
         to_port = "80"
