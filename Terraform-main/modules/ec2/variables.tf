@@ -4,12 +4,13 @@ variable "ami_id" {
 }
 
 variable "instance_type" {
-    description = "t2.micro"
+    description = "t3.micro"
     type = string
 }
 variable "vpc_security_group_ids" {
     description = "sg-0a320c517611a8e5d"
-    type = string
+    type = list(string)
+    default = []
 }
 
 variable "subnet_id" {
