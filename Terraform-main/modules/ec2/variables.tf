@@ -1,23 +1,23 @@
 variable "ami_id" {
-    description = ""
-    type = "string"
+    description = "ami-00e428798e77d38d9"
+    type = string
 }
 
 variable "instance_type" {
-    description = ""
-    type = "string"
+    description = "t2.micro"
+    type = string
 }
 variable "vpc_security_group_ids" {
-    description = "value"
-    type = "string"
+    description = "sg-0a320c517611a8e5d"
+    type = string
 }
 
 variable "subnet_id" {
-    description = "value"
-    type = "string"
+    description = "subnet-0708482e511e7e669"
+    type = string
 } 
 
 variable "instance_name"{
-    description = "value"
-    type = "string"
+    description = "demo-server"
+    type = string
 }
