@@ -1,29 +1,23 @@
-# Terraform Infrastructure — Sheersh123
+<p align="center">
+  <img alt="Terraform" src="https://img.shields.io/badge/Terraform-Infra-623CE4?style=for-the-badge&logo=terraform&logoColor=white" />
+  <br/>
+  <h1 align="center">Terraform Infrastructure — Sheersh123</h1>
+  <p align="center"><em>Reusable Terraform modules • Environment stacks • CI-friendly</em></p>
 
-[![Terraform Version](https://img.shields.io/badge/terraform-%3E%3D1.0-blue?logo=terraform)](https://www.terraform.io/)
-[![CI](https://img.shields.io/badge/CI-none-lightgrey)](#ci)
-[![License](https://img.shields.io/badge/license-Not%20Specified-lightgrey)](#license--ownership)
+  <p align="center" style="margin-top:10px">
+    <img alt="Modules" src="https://img.shields.io/badge/Modules-Reusable-2bbc8a?style=for-the-badge&logo=terraform" />
+    <img alt="Environments" src="https://img.shields.io/badge/Environments-dev%20%7C%20staging%20%7C%20prod-007ec6?style=for-the-badge&logo=hashicorp" />
+    <img alt="Examples" src="https://img.shields.io/badge/Examples-Included-ff7ab6?style=for-the-badge&logo=codecov" />
+    <img alt="CI" src="https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" />
+    <img alt="Docs" src="https://img.shields.io/badge/Docs-terraform--docs-8a2be2?style=for-the-badge&logo=read-the-docs" />
+    <img alt="License" src="https://img.shields.io/badge/License-Not%20Specified-00BFA5?style=for-the-badge&logo=github" />
+  </p>
 
-> A collection of Terraform configurations, reusable modules, and examples to provision cloud infrastructure in a repeatable, modular, and CI-friendly way.
+  <p align="center" style="margin-top:8px; color:#666;">
+    ─────────────────────────────────────────────────────────
+  </p>
+</p>
 
----
-
-Table of contents
-- [Overview](#overview)
-- [Quick links](#quick-links)
-- [Repository layout](#repository-layout)
-- [Getting started (quick start)](#getting-started-quick-start)
-- [How to use modules](#how-to-use-modules)
-- [Working with environments](#working-with-environments)
-- [Remote state example](#remote-state-example)
-- [Recommended tools & CI patterns](#recommended-tools--ci-patterns)
-- [Testing & validation](#testing--validation)
-- [Secrets & sensitive data](#secrets--sensitive-data)
-- [Contributing](#contributing)
-- [License & ownership](#license--ownership)
-- [Contact](#contact)
-
----
 
 ## Overview
 This repository is intended as a starting point and a home for reusable Terraform modules and environment stacks. It is designed to be:
