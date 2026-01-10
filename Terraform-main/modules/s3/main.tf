@@ -1,13 +1,14 @@
-resource "aws_s3_bucket" "demo_bucket" {
-    bucket = var.bucket_name
-    acl    = var.acl
+terraform {
+     required_providers {
+        aws = {
+            source = "hashicorp/aws"
+            version = " ~> 5.0"
 
-    tags = {
-        Name        = var.bucket_name
-        Environment = var.environment
-    }
-    versioning {
-        enabled = var.versioning_enabled
-    }
+        }
 
+    }
+    required_version = ">=1.3.0"
+}
+provider "aws" {
+    region = var.aws_region
 }
