@@ -21,6 +21,4 @@ module "demo_instance" {
     instance_name = var.instance_name
 }
 
-output "instance_id" {
-    value = module.ec2-server.instance_id
-}
+
