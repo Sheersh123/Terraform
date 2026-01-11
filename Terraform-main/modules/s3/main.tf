@@ -12,8 +12,8 @@ terraform {
 provider "aws" {
     region = var.aws_region
 }
-module "demo-server" {
-    source = "*./modules/ec2"
+module "demo_instance" {
+    source = "../ec2"
     ami_id = var.ami_id
     instance_type = var.instance_type
     vpc_security_group_ids = var.vpc_security_group_ids
