@@ -1,223 +1,181 @@
-<p align="center">
-  <img alt="Terraform" src="https://img.shields.io/badge/Terraform-Infra-623CE4?style=for-the-badge&logo=terraform&logoColor=white" />
-  <br/>
-  <h1 align="center">Terraform Infrastructure — Sheersh123</h1>
-  <p align="center"><em>Reusable Terraform modules • Environment stacks • CI-friendly</em></p>
+# 🌱 Terraform — Infrastructure as Code
 
-  <p align="center" style="margin-top:10px">
-    <img alt="Modules" src="https://img.shields.io/badge/Modules-Reusable-2bbc8a?style=for-the-badge&logo=terraform" />
-    <img alt="Environments" src="https://img.shields.io/badge/Environments-dev%20%7C%20staging%20%7C%20prod-007ec6?style=for-the-badge&logo=hashicorp" />
-    <img alt="Examples" src="https://img.shields.io/badge/Examples-Included-ff7ab6?style=for-the-badge&logo=codecov" />
-    <img alt="CI" src="https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" />
-    <img alt="Docs" src="https://img.shields.io/badge/Docs-terraform--docs-8a2be2?style=for-the-badge&logo=read-the-docs" />
-    <img alt="License" src="https://img.shields.io/badge/License-Not%20Specified-00BFA5?style=for-the-badge&logo=github" />
-  </p>
+[![GitHub Repo stars](https://img.shields.io/github/stars/Sheersh123/Terraform?style=for-the-badge)](https://github.com/Sheersh123/Terraform/stargazers)
+[![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.3-blue?style=for-the-badge)](https://www.terraform.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](./LICENSE)
+[![Open Issues](https://img.shields.io/github/issues/Sheersh123/Terraform?style=for-the-badge)](https://github.com/Sheersh123/Terraform/issues)
 
-  <p align="center" style="margin-top:8px; color:#666;">
-    ─────────────────────────────────────────────────────────
-  </p>
-</p>
-
-
-## Overview
-This repository is intended as a starting point and a home for reusable Terraform modules and environment stacks. It is designed to be:
-- Modular — small, single-responsibility modules
-- Environment-aware — separate folders for dev/staging/prod
-- CI-friendly — easy to run `fmt`, `validate`, `plan` and tests in automation
-
-Use it as:
-- Your personal/team infrastructure repo
-- A library of reusable modules
-- A reference for CI-driven Terraform workflows
+A clean, modular, and reusable collection of Terraform code and examples to help you provision cloud infrastructure consistently. Designed for clarity, best practices, and easy extension.
 
 ---
 
-## Quick links
-- Modules: [modules/](./modules)
-- Environments: [envs/](./envs)
-- Examples: [examples/](./examples)
-- CI workflows: [.github/workflows/](./.github/workflows) (if present)
+Table of Contents
+- About
+- Features
+- Repository Layout
+- Quick Start
+- Usage Examples
+- Variables & Outputs
+- Recommended Workflows & Best Practices
+- Testing & CI
+- Contributing
+- License
+- Contact
 
 ---
 
-## Repository layout
-Suggested layout (adapt to your needs):
-- modules/                — reusable Terraform modules (one module per directory)
-- envs/                   — environment-specific stacks (envs/dev, envs/prod)
-- examples/               — usage examples for modules/stacks
-- scripts/                — helper scripts (wrappers, automation helpers)
-- .github/workflows/      — CI workflows
-- README.md               — this file
+About
+-----
+This repository provides modular Terraform components, example stacks, and conventions for provisioning cloud infrastructure (AWS / Azure / GCP — provider-specific modules should live under the modules/ directory). It's ideal as a starting point for experiments, demos, or production-ready templates after customization.
 
-Example:
-- modules/network/
-- modules/compute/
-- envs/staging/main.tf
-- envs/production/main.tf
-- examples/simple-app/main.tf
+Features
+--------
+- Clear, opinionated layout for modules, root configs, and examples
+- Example environments (dev/test/prod) with best-practice state/backends
+- Reusable modules with documented inputs and outputs
+- Recommended linting, formatting, and CI checks
+- Guidance for secret management and remote state locking
 
----
+Repository Layout
+-----------------
+Example directory structure (this repo may vary):
+- modules/                — Reusable Terraform modules (networking, compute, db, etc.)
+- examples/               — Complete example stacks showing how to use modules
+- envs/                   — Environment-specific root configs (dev, prod, staging)
+- scripts/                — Helpful tooling scripts (bootstrap, helpers)
+- .github/workflows/      — CI workflows (lint, fmt, plan checks)
+- README.md               — You are here
+- LICENSE
 
-## Getting started (quick start)
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Sheersh123/Terraform.git
-   cd Terraform
-   ```
-2. Choose an environment or example:
-   ```bash
-   cd envs/dev         # or examples/simple-app
-   ```
-3. Initialize Terraform:
-   ```bash
-   terraform init
-   ```
-4. Preview changes:
-   ```bash
-   terraform plan -var-file="dev.tfvars"
-   ```
-5. Apply (when ready):
-   ```bash
-   terraform apply -var-file="dev.tfvars"
-   ```
+Quick Start
+-----------
+Prerequisites
+- Terraform >= 1.0 (pin exact version in your CI)
+- Optional: AWS CLI / Azure CLI / Google Cloud SDK configured
+- Recommended: git, jq
 
-Notes:
-- Prefer running `terraform plan` in CI and require human review for `apply` in production.
-- Keep provider credentials and secrets out of the repo.
+Clone the repo
+```bash
+git clone https://github.com/Sheersh123/Terraform.git
+cd Terraform
+```
 
----
+Initialize and plan (from a chosen example or env)
+```bash
+cd examples/simple-webapp
+terraform init
+terraform fmt -check
+terraform validate
+terraform plan -out=tfplan
+# Review the plan
+terraform show -json tfplan | jq .
+```
 
-## How to use modules
-Modules live under `modules/<name>/`. Each module should include:
-- `variables.tf` — documented inputs
-- `outputs.tf` — documented outputs
-- `README.md` — short example + input/output documentation
-- `examples/` — one or more usage examples (recommended)
+If you want to apply (careful — this will create resources)
+```bash
+terraform apply "tfplan"
+```
 
-Example module call:
+Usage Examples
+--------------
+Minimal example (examples/simple-webapp/main.tf):
 ```hcl
 module "vpc" {
-  source = "../../modules/network"
+  source = "../../modules/vpc"
+  name   = "example-vpc"
+  cidr   = "10.0.0.0/16"
+}
 
-  name       = "example-vpc"
-  cidr_block = "10.0.0.0/16"
-
-  tags = {
-    Environment = "dev"
-    Owner       = "team"
-  }
+module "web" {
+  source = "../../modules/webserver"
+  vpc_id = module.vpc.id
+  count  = 2
 }
 ```
 
-Best practices:
-- Keep modules small and focused (single responsibility)
-- Use explicit variable names and sensible defaults
-- Provide example usage and tests where practical
-- Pin provider versions in module `required_providers` when needed
+Module pattern (modules/webserver/README.md should document inputs/outputs):
+- Inputs: instance_type, ami, vpc_id, subnet_ids, ssh_key
+- Outputs: instance_ids, lb_dns_name
 
----
+Variables & Outputs
+-------------------
+Keep a variables.tf for each root/module documenting defaults and descriptions. Example snippet:
 
-## Working with environments
-Use `envs/<name>/` for environment-specific configuration:
-- envs/dev/
-  - main.tf
-  - variables.tf
-  - dev.tfvars
-
-Recommended patterns:
-- Keep environment-specific values in `*.tfvars`
-- Use remote state backends per environment
-- Use separate directories per environment for clarity in teams (instead of relying solely on workspaces)
-
-Navigating environments:
-- Look for README files inside each `envs/<name>/` to understand what resources the environment manages.
-- Use `terraform plan -var-file=<env>.tfvars` to preview changes.
-
----
-
-## Remote state example
-Example S3 backend (AWS):
 ```hcl
-terraform {
-  backend "s3" {
-    bucket         = "my-terraform-state"
-    key            = "envs/dev/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "terraform-locks"
-  }
+variable "region" {
+  description = "Cloud region to create resources in"
+  type        = string
+  default     = "us-east-1"
+}
+
+output "lb_dns" {
+  description = "The load balancer DNS name"
+  value       = aws_lb.main.dns_name
 }
 ```
-Replace with your cloud provider's remote state configuration (GCS, Azure Blob, etc.) and ensure state locking is enabled when supported.
 
----
+Recommended Workflows & Best Practices
+-------------------------------------
+- Use remote state (S3/GCS/AzureBlob) with state locking (DynamoDB/Cloud Storage locks)
+- Pin provider and Terraform versions in required_providers / required_version
+- Keep secrets out of Terraform files — use secret managers (AWS Secrets Manager, Vault) or encrypted variable stores
+- Use workspaces or separate state files for environments (dev/staging/prod)
+- Format and lint: `terraform fmt`, `tflint`, `checkov` or `terrascan` for policy checks
+- Review plans in PRs using `terraform plan -out=plan` and `terraform show -json plan` for CI integration
 
-## Recommended tools & CI patterns
-Local tooling:
-- Terraform CLI (>= 1.0; use latest stable)
-- `terraform fmt -recursive`
-- `terraform validate`
-- `tflint` — linting
-- `tfsec` / `checkov` — security scanning
-- `terraform-docs` — generate module docs
+CI / Testing
+------------
+Suggested checks to run in CI:
+- terraform fmt -check
+- terraform validate
+- tflint
+- terraform init & plan (on PRs)
+- Optional: unit/integration tests via Terratest (Go) or kitchen-terraform
 
-CI suggestions:
-- On PRs run:
-  - `terraform fmt` (check-only)
-  - `terraform init` (with read-only/mocked creds if possible)
-  - `terraform validate`
-  - `tflint` / `tfsec` / `checkov`
-  - `terraform plan` and expose plan output as a PR artifact
-- Require manual approval for `apply` to production (or use an operator pipeline)
+Example GitHub Actions snippet (for PR plan):
+```yaml
+name: Terraform PR
+on: [pull_request]
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+      - run: terraform fmt -check
+      - run: terraform init -backend=false
+      - run: terraform validate
+      - run: terraform plan -out=tfplan
+```
 
----
+Contributing
+------------
+Contributions are welcome! Please:
+1. Open an issue to discuss major changes.
+2. Fork the repository and create a feature branch.
+3. Keep changes small and focused; add tests/examples where applicable.
+4. Follow the existing module patterns and update module README files.
+5. Submit a pull request with a clear description of intent and testing performed.
 
-## Testing & validation
-- Unit-ish checks: run `terraform plan` with controlled inputs and validate expected diffs
-- Integration tests: Terratest (Go) or kitchen-terraform (Ruby) for end-to-end testing
-- Linting and security: `tflint`, `tfsec`, `checkov` in CI
+Code of Conduct
+---------------
+This project follows a Code of Conduct. Be kind and respectful in all interactions.
 
-Example workflow:
-- PR: `fmt`, `validate`, `tflint`, `tfsec`, `terraform plan`
-- Optional: run acceptance tests in ephemeral resources and destroy after tests
+License
+-------
+This repository is available under the MIT License. See the LICENSE file for details.
 
----
+Credits & Contact
+-----------------
+Maintainer: Sheersh123  
+If you want this README adjusted (custom badges, provider-specific examples, or a repo push), tell me which environment or modules you want emphasized and I’ll update it.
 
-## Secrets & sensitive data
-- Never commit secrets or provider keys to the repo
-- Use CI secret stores or cloud secret managers (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault)
-- Mark sensitive variables with `sensitive = true` in variable definitions
-- Use environment variables or encrypted secret injection in CI for providers
-
----
-
-## Contributing
-Contributions welcome — suggested flow:
-1. Open an issue describing the change or problem.
-2. Create a branch: `git checkout -b feat/<short-description>`
-3. Implement changes, add/update examples and tests
-4. Run `terraform fmt`, `terraform validate`, and other linters
-5. Open a pull request with a clear description
-
-Module-specific contribution tips:
-- Provide/maintain module-level README and examples
-- Follow existing naming conventions for inputs/outputs
-- Keep changes small and focused; add tests when possible
-
----
-
-## License & ownership
-This repository currently does not include a LICENSE file. To allow reuse, consider adding a LICENSE (MIT, Apache-2.0, etc.). If you are the repo owner, add a LICENSE file at the repository root.
-
----
-
-## Contact
-Repo owner: Sheersh123  
-For questions or support, open an issue in this repository.
-
----
-
-## Suggested next steps (todo)
-- Add a LICENSE file (MIT or Apache-2.0 recommended)
-- Add module-level README and example `tfvars` for each environment
-- Add CI workflows under `.github/workflows/` to run `fmt`/`validate`/linters and produce plan artifacts
-- Optionally add automated documentation generation (e.g., `terraform-docs`) to keep module docs up-to-date
+Appendix — Useful Commands
+--------------------------
+- Format: terraform fmt -recursive
+- Validate: terraform validate
+- Lint: tflint
+- Check: checkov -d .
+- Plan: terraform plan -out=tfplan
+- Apply: terraform apply tfplan
